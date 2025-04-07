@@ -66,13 +66,16 @@ This project delivers personalized game recommendations through:
   - `LIKES`, `SIMILAR_TO`, `RECOMMENDED`
 - Precompute similarities with cosine/Jaccard similarity or Node2Vec.
 
-### 3. Machine Learning Models (Not Final)
+### 3. Machine Learning Models
+#TO-DO
 
 - **ALS** for collaborative filtering based on playtime data.
 - **Content-based** via genre, tags, and text embeddings.
 - **Hybrid** model combines scores using a weighted system.
 
+
 ### 4. Personalized Recommendations
+#TO-DO
 
 - New users: Recommend based on selected favorites.
 - Steam-linked users: Recommend based on top-played games.
@@ -81,8 +84,7 @@ This project delivers personalized game recommendations through:
 ---
 
 ## ✅ Setup Instructions
-
-Insert Setup Instructions when project is finished 
+#TO-DO
 
 ---
 
