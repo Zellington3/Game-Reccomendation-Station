@@ -1,8 +1,9 @@
 from neo4j import GraphDatabase
 
+
 # Neo4j connection details
-URI = "bolt://localhost:7687"  # Update if needed
-AUTH = ("neo4j", "society-jackson-resume-beauty-first-2016")  # Replace with your Neo4j credentials
+URI = "bolt://localhost:7687"
+AUTH = ("neo4j", "password")
 
 def execute_query(driver, query):
     with driver.session() as session:
@@ -11,7 +12,6 @@ def execute_query(driver, query):
 def main():
     driver = GraphDatabase.driver(URI, auth=AUTH)
 
-    # === Create Constraints ===
     constraints = [
         "CREATE CONSTRAINT IF NOT EXISTS FOR (g:Game) REQUIRE g.app_id IS UNIQUE",
         "CREATE CONSTRAINT IF NOT EXISTS FOR (u:User) REQUIRE u.user_id IS UNIQUE",
@@ -22,7 +22,6 @@ def main():
         execute_query(driver, constraint)
         print(f"Applied constraint: {constraint}")
 
-    # === Data Loading Queries ===
     load_queries = [
 
         # Load Game nodes

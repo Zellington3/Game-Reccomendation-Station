@@ -1,0 +1,7 @@
+pandas
+numpy
+scipy==1.11.4
+neo4j
+scikit-learn
+implicit>=0.7.0 # Ensure recent version for potential features/fixes
+optuna>=3.0.0  # Ensure recent version
