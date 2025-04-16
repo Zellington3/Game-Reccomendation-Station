@@ -1,4 +1,3 @@
-# utils.py
 import pandas as pd
 import numpy as np
 import scipy.sparse as sparse
@@ -9,7 +8,6 @@ import os
 import logging
 import time
 
-# Assuming config.py exists and has necessary variables like MODEL_DIR etc.
 try:
     import config
 except ImportError:
@@ -27,7 +25,7 @@ except ImportError:
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# --- create_sparse_matrices (Unchanged from previous correct version) ---
+# create_sparse_matrices 
 def create_sparse_matrices(likes_df, test_size=0.2, random_state=42,
                            create_full_split=False,
                            existing_user_map=None,
@@ -108,7 +106,7 @@ def create_sparse_matrices(likes_df, test_size=0.2, random_state=42,
         return train_matrix, test_matrix, user_map, game_map, game_id_map
 
 
-# --- build_genre_similarity_matrix (Unchanged from previous correct version) ---
+# build_genre_similarity_matrix 
 def build_genre_similarity_matrix(genre_df, game_map):
     if genre_df is None or genre_df.empty: logging.warning("⚠️ Genre DataFrame empty. Skipping genre matrix."); return None, None
     if not game_map: logging.warning("⚠️ game_map missing. Skipping genre matrix."); return None, None
@@ -156,7 +154,7 @@ def build_genre_similarity_matrix(genre_df, game_map):
     return similarity_matrix, genre_game_lookup
 
 
-# --- save_model_artifacts (Handles GPU factors) ---
+# save_model_artifacts (Handles GPU factors)
 def save_model_artifacts(model_dir, model, user_map, game_map, game_id_map,
                          genre_sim_matrix, genre_game_lookup, metrics=None,
                          best_hpo_params=None):
@@ -165,7 +163,7 @@ def save_model_artifacts(model_dir, model, user_map, game_map, game_id_map,
     os.makedirs(model_dir, exist_ok=True)
     timestamp = time.strftime("%Y%m%d-%H%M%S")
     try:
-        # --- Save main model object (with warning) ---
+        # Save main model object (with warning) 
         model_path = os.path.join(model_dir, "als_model.pkl")
         try:
             with open(model_path, "wb") as f: pickle.dump(model, f)
@@ -174,7 +172,7 @@ def save_model_artifacts(model_dir, model, user_map, game_map, game_id_map,
              logging.warning(f"⚠️ Could not pickle full model object (may contain GPU refs): {pickle_err}. Saving factors separately is recommended.")
              if os.path.exists(model_path): os.remove(model_path)
 
-        # --- Save factors (Convert GPU->NumPy first) ---
+        # Save factors (Convert GPU->NumPy first)
         item_factors_to_save = None; user_factors_to_save = None
         if hasattr(model, 'item_factors') and model.item_factors is not None:
             if 'implicit.gpu' in str(type(model.item_factors)):
@@ -196,19 +194,19 @@ def save_model_artifacts(model_dir, model, user_map, game_map, game_id_map,
                   np.save(os.path.join(model_dir, "user_factors.npy"), user_factors_to_save)
                   logging.info(f" Saved user_factors.npy (shape: {user_factors_to_save.shape})")
 
-        # --- Save mappings ---
+        # Save mappings 
         with open(os.path.join(model_dir, "user_map.pkl"), "wb") as f: pickle.dump(user_map, f)
         with open(os.path.join(model_dir, "game_map.pkl"), "wb") as f: pickle.dump(game_map, f)
         with open(os.path.join(model_dir, "game_id_map.pkl"), "wb") as f: pickle.dump(game_id_map, f)
 
-        # --- Save genre artifacts ---
+        # Save genre artifacts
         if genre_sim_matrix is not None and genre_game_lookup is not None:
              sparse.save_npz(os.path.join(model_dir, "genre_sim_matrix.npz"), genre_sim_matrix)
              with open(os.path.join(model_dir, "genre_game_lookup.pkl"), "wb") as f: pickle.dump(genre_game_lookup, f)
              logging.info(f" Saved genre_sim_matrix.npz and genre_game_lookup.pkl")
         else: logging.info("⚠️ Genre similarity matrix/lookup None, skipping save.")
 
-        # --- Save metadata ---
+        # Save metadata
         metadata = {
             "timestamp": timestamp, "metrics": metrics or {}, "best_hpo_params": best_hpo_params or {},
             "model_class": type(model).__name__ if model else None,
@@ -219,7 +217,7 @@ def save_model_artifacts(model_dir, model, user_map, game_map, game_id_map,
         with open(metadata_path, "wb") as f: pickle.dump(metadata, f)
         logging.info(f" Saved metadata to {metadata_path}")
 
-        # --- Save human-readable summary ---
+        # Save human-readable summary
         summary_path = os.path.join(model_dir, "training_summary.txt")
         with open(summary_path, "w") as f:
              f.write(f"Timestamp: {timestamp}\nModel: {metadata['model_class']}\nFinal Params Used: {metadata['final_model_params']}\n")
@@ -241,7 +239,7 @@ def save_model_artifacts(model_dir, model, user_map, game_map, game_id_map,
         return False
 
 
-# --- load_model_artifacts (Unchanged from previous correct version) ---
+# load_model_artifacts
 def load_model_artifacts(model_dir):
     logging.info(f"📦 Loading model artifacts from {model_dir}...")
     artifacts = {}
