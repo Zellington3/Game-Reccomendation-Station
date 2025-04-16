@@ -22,7 +22,6 @@ A hybrid game recommendation system that combines collaborative filtering (ALS) 
 - [🔧 Troubleshooting](#-troubleshooting)
 - [🤝 Contributing](#-contributing)
 - [❓ Need Help?](#-need-help)
-- [📝 License](#-license)
 
 ---
 
