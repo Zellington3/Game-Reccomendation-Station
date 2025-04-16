@@ -8,8 +8,7 @@ A hybrid game recommendation system that combines collaborative filtering (ALS) 
 
 - [🌟 Features](#-features)
 - [🔧 Prerequisites](#-prerequisites)
-- [📥 Installation](#-installation)
-- [⚙️ Configuration](#-configuration)
+- [📥 Installation & Configuration](#-installation--configuration)
 - [📊 Data Preparation](#-data-preparation)
   - [1. Data Cleaning & Preprocessing](#1-data-cleaning--preprocessing)
   - [2. Loading Data into Neo4j](#2-loading-data-into-neo4j)
@@ -49,7 +48,7 @@ A hybrid game recommendation system that combines collaborative filtering (ALS) 
 
 ---
 
-## 📥 Installation
+## 📥 Installation & Configuration
 
 Follow these steps to set up the entire project, including the recommender, Neo4j data loader, and data cleaning.
 
@@ -144,13 +143,25 @@ To download game metadata, you need Kaggle API credentials.
    export STEAM_API_KEY="your_steam_api_key"
    ```
 
+### Step 9: Configuration in `config.py`
+
+- Set the following in your `config.py` file:
+  - **Neo4j Connection**:
+    - `NEO4J_URI`: The URI of your Neo4j instance (e.g., `bolt://localhost:7687`).
+    - `NEO4J_USER`: Your Neo4j username (e.g., `neo4j`).
+    - `NEO4J_PASSWORD`: Path to your `dbpassword.txt` file or set as an environment variable.
+  - **Optional Configuration**:
+    - `MIN_PLAYTIME`: Minimum playtime for games to be considered in recommendations.
+    - `OPTUNA_N_TRIALS`: Number of trials for Optuna hyperparameter optimization.
+    - `MAX_SAFE_FACTORS`: Maximum number of factors for ALS model.
+
 ---
 
 ### Final Setup
 
 Once all dependencies are installed and configurations are set, follow these steps to prepare your data:
 
-### Step 9: Run Data Cleaning Script
+### Step 10: Run Data Cleaning Script
 
 Before training the model, you'll need to clean and preprocess the data.
 
@@ -166,7 +177,7 @@ Before training the model, you'll need to clean and preprocess the data.
    - This script requires Kaggle credentials to download and clean the raw game data.
    - The cleaned data will be saved in `scripts/output/`.
 
-### Step 10: Load Data into Neo4j
+### Step 11: Load Data into Neo4j
 
 Once the data is cleaned, you’ll need to load it into your Neo4j database.
 
@@ -183,43 +194,12 @@ Once the data is cleaned, you’ll need to load it into your Neo4j database.
 Once all setup steps are complete, you’ll be ready to train the model and use the recommender system!
 
 ```bash
-# Step 11: Train the Model
+# Step 12: Train the Model
 python train.py
 
-# Step 12: Run the Recommender
+# Step 13: Run the Recommender
 python example_hybrid_recommender.py
 ```
-
-This updated **Installation** section includes setup steps for everything from dependencies, Neo4j, Kaggle API, and the data cleaning process, making sure you have all the components ready to run the recommendation system. Let me know if anything else is needed!
-
----
-
-## ⚙️ Configuration
-
-### 1. Kaggle API
-
-- Place `kaggle.json` in `~/.kaggle/`
-- Run: `chmod 600 ~/.kaggle/kaggle.json`
-
-### 2. Neo4j Password
-
-- Create `dbpassword.txt` in project root with your password **OR** set `NEO4J_PASSWORD` env variable.
-
-### 3. Steam API Key (Optional)
-
-- Get one [here](https://steamcommunity.com/dev/apikey)
-- Export: `export STEAM_API_KEY="your_key"`
-
-### 4. Neo4j Setup
-
-- Install APOC plugin
-- Configure memory settings in Neo4j (`neo4j.conf`)
-- Sample: Heap 4G, Pagecache 8G, Transaction 2G
-
-### 5. `config.py`
-
-- Set `NEO4J_URI`, `NEO4J_USER`, and password file path.
-- Adjust: `MIN_PLAYTIME`, `OPTUNA_N_TRIALS`, `MAX_SAFE_FACTORS`, etc.
 
 ---
 
@@ -406,6 +386,5 @@ Please follow existing style conventions and include comments or docstrings wher
 ## ❓ Need Help?
 
 Got questions or suggestions? Feel free to [open an issue](https://github.com/zellington3/ReccomendationStation/issues) or message me through my [GitHub profile](https://github.com/zellington3)! I'm happy to help. 😊
-
 ---
 
