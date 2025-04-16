@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import os
 import json
 import logging
@@ -17,7 +16,6 @@ from neo4j import GraphDatabase, basic_auth
 
 import config
 
-# Configure logging
 logging.basicConfig(
     level=getattr(logging, config.LOG_LEVEL),
     format=config.LOG_FORMAT
@@ -33,8 +31,8 @@ class SteamRecommender:
         self.model = None
         self.user_mapping = None
         self.item_mapping = None
-        self.game_id_map = None  # Add this to store the reverse mapping
-        self.game_metadata = None  # Add this to store game metadata
+        self.game_id_map = None  
+        self.game_metadata = None 
         self.driver = GraphDatabase.driver(
             config.NEO4J_URI,
             auth=(config.NEO4J_USER, config.NEO4J_PASSWORD)
@@ -47,7 +45,6 @@ class SteamRecommender:
         
         metadata = {}
         
-        # First check if we have cached metadata
         cache_file = os.path.join(self.model_dir, 'game_metadata_cache.json')
         if os.path.exists(cache_file):
             try:
@@ -59,7 +56,6 @@ class SteamRecommender:
                         return cached_metadata
             except Exception as e:
                 logger.warning(f"Error reading metadata cache: {e}")
-        
         # If not in cache, fetch from Neo4j
         try:
             with self.driver.session(database="neo4j") as session:
