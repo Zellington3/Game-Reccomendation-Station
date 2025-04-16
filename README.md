@@ -1,3 +1,4 @@
+---
 # 🎮 Steam Game Recommendation System
 
 A hybrid game recommendation system that combines collaborative filtering (ALS) with Neo4j graph features to provide personalized game recommendations based on Steam profiles and gaming preferences.
@@ -19,6 +20,8 @@ A hybrid game recommendation system that combines collaborative filtering (ALS) 
 - [🔍 How It Works](#-how-it-works)
 - [📦 First-Time Setup After Cloning](#-first-time-setup-after-cloning)
 - [🔧 Troubleshooting](#-troubleshooting)
+- [🤝 Contributing](#-contributing)
+- [❓ Need Help?](#-need-help)
 - [📝 License](#-license)
 
 ---
@@ -211,10 +214,6 @@ python app.py
 - **Data cleaning issues**: Ensure valid Kaggle API key and file permissions
 
 ---
-## ❓ Need Help?
-
-Got questions or suggestions? Feel free to [open an issue](https://github.com/zellington3/ReccomendationStation/issues) or email me through my [GitHub profile](https://github.com/zellington3)! I'm happy to help. 😊
----
 
 ## 🤝 Contributing
 
@@ -222,12 +221,21 @@ Contributions are welcome and encouraged! 🚀
 
 If you have ideas for improvements, bug fixes, or new features:
 
-1. Fork the repository
-2. Create a new branch (`git checkout -b feature/your-feature-name`)
-3. Make your changes
-4. Commit your changes (`git commit -m 'Add some feature'`)
-5. Push to the branch (`git push origin feature/your-feature-name`)
+1. Fork the repository  
+2. Create a new branch (`git checkout -b feature/your-feature-name`)  
+3. Make your changes  
+4. Commit your changes (`git commit -m 'Add some feature'`)  
+5. Push to the branch (`git push origin feature/your-feature-name`)  
 6. Open a Pull Request
 
 Please ensure your code follows the existing style and include relevant documentation or comments where needed.
+
+Got questions or suggestions? Feel free to open an issue — we’d love to hear from you!
+
+---
+
+## ❓ Need Help?
+
+Got questions or suggestions? Feel free to [open an issue](https://github.com/zellington/ReccomendationStation/issues) or email me through my [GitHub profile](https://github.com/zellington3)! I'm happy to help. 😊
+
 ---
