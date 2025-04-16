@@ -1,4 +1,3 @@
-# data_loader.py
 import pandas as pd
 from neo4j import GraphDatabase, basic_auth
 import logging
@@ -9,7 +8,6 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 def get_neo4j_password(password_file):
     """Reads the Neo4j password from a file."""
-    # (Same helper function as in neo4j_data_loader.py)
     try:
         with open(password_file, "r") as f:
             return f.read().strip()
@@ -27,7 +25,6 @@ def load_neo4j_data(uri=config.NEO4J_URI, user=config.NEO4J_USER,
     password = get_neo4j_password(password_file)
     if not password:
         logging.error("❌ Neo4j password could not be read.")
-        # Return empty dataframes on failure
         return pd.DataFrame(), pd.DataFrame()
 
     likes_df = pd.DataFrame()
@@ -105,7 +102,7 @@ def load_neo4j_data(uri=config.NEO4J_URI, user=config.NEO4J_USER,
             driver.close()
             logging.info("🚪 Neo4j connection closed.")
 
-    # --- Final Validation (optional but recommended) ---
+    # Final Validation 
     if not likes_df.empty:
         if likes_df['user_id'].isnull().any() or likes_df['game_id'].isnull().any():
             logging.warning("⚠️ Likes data contains unexpected null user_ids or game_ids after load. Check query/data.")
