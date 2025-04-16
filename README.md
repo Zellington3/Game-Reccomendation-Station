@@ -210,6 +210,22 @@ python app.py
 - **GPU install issues**: Check `nvidia-smi`, reinstall with `--no-binary implicit`
 - **Data cleaning issues**: Ensure valid Kaggle API key and file permissions
 
-### Need Help
-  - Contact me via the email on my github profile
+
+### Need Help?
+  - Got questions or suggestions? Feel free to open an issue or email me from my profile!!
+
+## 🤝 Contributing
+
+Contributions are welcome and encouraged! 🚀
+
+If you have ideas for improvements, bug fixes, or new features:
+
+1. Fork the repository
+2. Create a new branch (`git checkout -b feature/your-feature-name`)
+3. Make your changes
+4. Commit your changes (`git commit -m 'Add some feature'`)
+5. Push to the branch (`git push origin feature/your-feature-name`)
+6. Open a Pull Request
+
+Please ensure your code follows the existing style and include relevant documentation or comments where needed.
 ---
