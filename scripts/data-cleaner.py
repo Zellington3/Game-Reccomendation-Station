@@ -10,14 +10,14 @@ from neo4j import GraphDatabase
 driver = GraphDatabase.driver("bolt://localhost:7687", auth=("neo4j", "delta-driver-mental-forward-beatles-5669"))
 driver.verify_connectivity()
 
-# Setup logging
+# logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Output directory setup
 OUTPUT_DIR = "output/"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-# Step 1: Load Datasets via kagglehub
+# Load Datasets via kagglehub
 def load_data():
     logging.info("Downloading Steam dataset...")
     steam_path = kagglehub.dataset_download("antonkozyriev/game-recommendations-on-steam")
@@ -45,7 +45,7 @@ def load_data():
 
     return steam_games, steam_recs, steam_users, pop_games
 
-# Step 2: Clean Data
+# Clean Data
 def clean_data(steam_games, steam_recs, steam_users, pop_games):
     logging.info("Cleaning datasets...")
     steam_recs = steam_recs.drop_duplicates(subset=['user_id', 'app_id'])
@@ -70,7 +70,7 @@ def clean_data(steam_games, steam_recs, steam_users, pop_games):
 
     return steam_games, steam_recs, steam_users, pop_games
 
-# Step 3: Normalize Ratings to 0-10 Scale
+# Normalize Ratings to 0-10 Scale
 def normalize_ratings(steam_games, steam_recs, pop_games):
     logging.info("Normalizing ratings...")
     def hours_to_rating(hours):
@@ -98,7 +98,7 @@ def normalize_ratings(steam_games, steam_recs, pop_games):
 
     return steam_games, steam_recs, pop_games
 
-# Step 4: Merge steam and popular games Datasets
+# Merge steam and popular games Datasets
 def merge_datasets(steam_games, steam_recs, pop_games):
     logging.info("Merging datasets...")
     merged_games = steam_games[['app_id', 'title', 'date_release', 'normalized_rating', 'win', 'mac', 'linux']].copy()
@@ -140,7 +140,7 @@ def merge_datasets(steam_games, steam_recs, pop_games):
 
     return merged_games, merged_recs
 
-# Step 5: Structure the Data for Neo4j
+# Structure the Data for Neo4j
 def structure_for_neo4j(steam_users, merged_games, merged_recs):
     logging.info("Structuring data for Neo4j...")
     users_df = steam_users[['user_id']].copy()
@@ -163,7 +163,7 @@ def structure_for_neo4j(steam_users, merged_games, merged_recs):
 
     return users_df, games_df, unique_genres, game_genre_df[['app_id', 'genre']], likes_df
 
-# Step 6: Exporting files to CSVs
+# Exporting files to CSVs
 def export_to_csv(users_df, games_df, genres_df, game_genre_df, likes_df):
     logging.info("Exporting to CSV...")
     users_df.to_csv(os.path.join(OUTPUT_DIR, "users.csv"), index=False)
@@ -173,7 +173,7 @@ def export_to_csv(users_df, games_df, genres_df, game_genre_df, likes_df):
     likes_df.to_csv(os.path.join(OUTPUT_DIR, "likes.csv"), index=False)
     print("CSV files exported to:", OUTPUT_DIR)
 
-# Step 7: Validation
+# Validation
 def validate_data(likes_df, games_df):
     logging.info("Validating data...")
     print("Rating Distribution (Likes):")
