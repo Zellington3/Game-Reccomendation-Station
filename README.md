@@ -279,9 +279,7 @@ If you have ideas for improvements, bug fixes, or new features:
 2. Create a new branch  
 3. Make your changes  
 4. Commit and push  
-5
-
-. Open a Pull Request
+5. Open a Pull Request
 
 Please follow existing style conventions and include comments or docstrings where relevant.
 
@@ -293,6 +291,3 @@ Got questions or suggestions? Feel free to [open an issue](https://github.com/ze
 
 ---
 
-## 📝 License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
