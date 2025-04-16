@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import os
 import json
 import logging
@@ -36,7 +35,6 @@ except ImportError:
         RANDOM_SEED = 42; MODEL_DIR = "model"; BASE_DIR = '.'; DB_PASSWORD_FILE = 'dbpassword.txt'
     config = ConfigMock()
 
-# Configure logging for this module - Set to ERROR by default
 # This ensures warnings/info from this module itself are hidden unless overridden
 module_logger = logging.getLogger(__name__) # Use __name__ for the logger name
 module_logger.setLevel(logging.ERROR)
@@ -54,7 +52,6 @@ class ALSHybridRecommender:
     """A class for generating game recommendations using ALS with Neo4j data."""
 
     def __init__(self, model_dir: str = "model"):
-        # (Initialization remains the same)
         self.model_dir = model_dir
         self.model: Optional[AlternatingLeastSquares] = None; self.user_mapping: Optional[Dict[str, int]] = None
         self.item_mapping: Optional[Dict[str, int]] = None; self.game_id_map: Optional[Dict[int, str]] = None
@@ -79,7 +76,6 @@ class ALSHybridRecommender:
 
     def load_model(self) -> None:
         """Load the trained ALS model factors and mappings."""
-        # (Implementation remains the same)
         try:
             user_map_path = os.path.join(self.model_dir, 'user_map.pkl'); game_map_path = os.path.join(self.model_dir, 'game_map.pkl')
             game_id_map_path = os.path.join(self.model_dir, 'game_id_map.pkl'); item_factors_path = os.path.join(self.model_dir, 'user_factors.npy') # SWAPPED
@@ -242,7 +238,6 @@ class ALSHybridRecommender:
             steam_api_key = getattr(config, 'STEAM_API_KEY', None)
             if not steam_api_key: module_logger.error("Steam API key missing."); return None
             try:
-                # Use print for user feedback, error for actual errors
                 print(f"Resolving vanity URL '{vanity_name}'...")
                 api_url = f"https://api.steampowered.com/ISteamUser/ResolveVanityURL/v1/?key={steam_api_key}&vanityurl={vanity_name}"
                 response = requests.get(api_url, timeout=10); response.raise_for_status(); data = response.json(); api_response = data.get('response', {})
@@ -258,7 +253,6 @@ class ALSHybridRecommender:
         if not steam_api_key: module_logger.error("Steam API key missing."); return {'games': [], 'total_games': 0}
         profile_info = {'games': [], 'total_games': 0}
         try:
-            # Use print for user feedback
             print(f"Fetching Steam library for user {steam_id}...")
             games_url = f"https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key={steam_api_key}&steamid={steam_id}&include_appinfo=1&include_played_free_games=1&format=json"
             response_games = requests.get(games_url, timeout=20); response_games.raise_for_status(); data_games = response_games.json(); api_response_games = data_games.get('response', {})
@@ -408,8 +402,7 @@ class ALSHybridRecommender:
         """Generates hybrid recommendations, fetching names/genres only at the end."""
         resolved_steam_id = self._resolve_steam_id(steam_id_or_vanity)
         if not resolved_steam_id: module_logger.error(f"Could not resolve '{steam_id_or_vanity}'."); module_logger.warning("Falling back to general popular."); return self._get_popular_recommendations(n=n)
-        # Use module_logger for internal step, main logger for user feedback print
-        module_logger.info(f"Getting hybrid recommendations for user {resolved_steam_id}...") # Use INFO here for internal step log if needed
+        module_logger.info(f"Getting hybrid recommendations for user {resolved_steam_id}...")
         try:
             profile_data = self._fetch_steam_profile(resolved_steam_id) # Fetch profile once
             owned_app_ids = [game['appid'] for game in profile_data['games']] if profile_data and profile_data.get('games') else []
