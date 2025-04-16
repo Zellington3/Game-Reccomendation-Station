@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import os
 from pathlib import Path
 
@@ -14,6 +13,7 @@ os.makedirs(CACHE_DIR, exist_ok=True)
 # Neo4j configuration
 NEO4J_URI = "bolt://localhost:7687"
 NEO4J_USER = "neo4j"
+
 # Read password from environment variable or file
 NEO4J_PASSWORD = os.environ.get("NEO4J_PASSWORD")
 if not NEO4J_PASSWORD:
@@ -31,6 +31,7 @@ if not STEAM_API_KEY:
             STEAM_API_KEY = f.read().strip()
     except FileNotFoundError:
         STEAM_API_KEY = None 
+        
 # Model parameters
 ALS_FACTORS = 64
 ALS_ITERATIONS = 20
