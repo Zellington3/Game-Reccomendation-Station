@@ -1,11 +1,9 @@
-# recommend.py
 import logging
 import argparse
 import numpy as np
 import scipy.sparse as sparse
 import os 
 
-# Setup logging BEFORE importing 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 try:
@@ -21,7 +19,7 @@ def get_recommendations_for_user_input(
     input_playtimes=None, # Optional dictionary: {game_id: playtime}
     n_recommendations=10,
     artifacts=None,
-    default_confidence=config.DEFAULT_RECOMMEND_CONFIDENCE # Use value from config
+    default_confidence=config.DEFAULT_RECOMMEND_CONFIDENCE 
     ):
     """
     Generates recommendations based on user-provided game IDs and optional playtimes.
