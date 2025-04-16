@@ -1,4 +1,3 @@
-# train.py
 import logging
 import optuna
 import numpy as np
@@ -9,7 +8,6 @@ import time
 from scipy.sparse import csr_matrix
 import argparse
 
-# Assuming implicit is installed and available (CPU or GPU version)
 try:
     from implicit.als import AlternatingLeastSquares
     from implicit.evaluation import precision_at_k, ndcg_at_k
@@ -22,7 +20,7 @@ try:
 except ImportError:
      logging.error("❌ 'implicit' library not found. Install it (`pip install implicit` or `pip install 'implicit[gpu]'`)."); exit(1)
 
-# --- Check for Parquet dependency ---
+# Check for Parquet dependency 
 try:
     import pyarrow
     PARQUET_ENABLED = True
@@ -35,7 +33,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 optuna.logging.get_logger("optuna").addHandler(logging.StreamHandler())
 optuna.logging.get_logger("optuna").setLevel(logging.WARNING)
 
-# --- Import project modules ---
+# Import project modules
 try:
     import config
     import data_loader
@@ -43,7 +41,7 @@ try:
 except ImportError as e:
      logging.error(f"❌ Failed to import project modules (config, data_loader, utils): {e}"); exit(1)
 
-# --- Objective function (Using direct use_gpu=False for eval) ---
+# Objective function (Using direct use_gpu=False for eval) 
 def objective(trial, train_matrix_hpo, test_matrix_hpo, k, random_state):
     # Suggest hyperparameters
     factors = trial.suggest_int("factors", 16, 128)
