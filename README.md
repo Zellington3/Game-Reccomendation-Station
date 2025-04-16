@@ -2,245 +2,214 @@
 
 A hybrid game recommendation system that combines collaborative filtering (ALS) with Neo4j graph features to provide personalized game recommendations based on Steam profiles and gaming preferences.
 
+---
+
 ## 📋 Table of Contents
-- [Features](#-features)
-- [Prerequisites](#-prerequisites)
-- [Installation](#-installation)
-- [Configuration](#-configuration)
-- [Usage Guide](#-usage-guide)
+
+- [🌟 Features](#-features)
+- [🔧 Prerequisites](#-prerequisites)
+- [📥 Installation](#-installation)
+- [⚙️ Configuration](#-configuration)
+- [📊 Data Preparation](#-data-preparation)
+  - [1. Data Cleaning & Preprocessing](#1-data-cleaning--preprocessing)
+  - [2. Loading Data into Neo4j](#2-loading-data-into-neo4j)
+- [🚀 Usage Guide](#-usage-guide)
   - [Training the Model](#training-the-model)
   - [Using the Recommender](#using-the-recommender)
-- [How It Works](#-how-it-works)
-- [Troubleshooting](#-troubleshooting)
+- [🔍 How It Works](#-how-it-works)
+- [📦 First-Time Setup After Cloning](#-first-time-setup-after-cloning)
+- [🔧 Troubleshooting](#-troubleshooting)
+- [📝 License](#-license)
+
+---
 
 ## 🌟 Features
 
-- **Steam Profile Integration**: Get recommendations based on your Steam library
-- **Hybrid Recommendations**: Combines ALS collaborative filtering with Neo4j graph features
-- **GPU Acceleration**: Supports GPU-accelerated training (with CUDA)
-- **Flexible Input**: Accept Steam IDs, vanity URLs, or full profile URLs
-- **Rich Metadata**: Includes game genres, descriptions, and similarity scores
-- **Caching**: Efficient caching of Steam metadata and training data
+- **Steam Profile Integration**: Personalized recommendations using your Steam library.
+- **Hybrid Recommendations**: Merges ALS collaborative filtering with Neo4j-based graph insights.
+- **GPU Acceleration**: Supports GPU training with `implicit[gpu]`.
+- **Flexible Input**: Accepts Steam IDs, vanity URLs, full URLs, or manual game lists.
+- **Rich Metadata**: Uses genre data and interaction metrics.
+- **Data Preprocessing**: Tools to clean, merge, and filter public game datasets.
+
+---
 
 ## 🔧 Prerequisites
 
-- Python 3.8+
-- Neo4j Database (local or cloud)
-- Steam API Key
+- Python 3.8+ (tested with 3.11)
+- Neo4j (v4.x or v5.x)
+- APOC Plugin (required for `neo4j_data_loader.py`)
+- Kaggle API credentials (`~/.kaggle/kaggle.json`)
+- Steam API Key (optional)
+- 32GB+ RAM recommended
 - CUDA-capable GPU (optional, for GPU acceleration)
+
+---
 
 ## 📥 Installation
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/ReccomendationStation.git
-   cd ReccomendationStation
-   ```
+```bash
+# Clone the repo
+git clone https://github.com/yourusername/ReccomendationStation.git
+cd ReccomendationStation
 
-2. Create and activate a virtual environment:
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
+# Create and activate virtual environment
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
 
-3. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
+# Install dependencies
+pip install --upgrade pip
+pip install -r requirements.txt
 
-4. For GPU support (optional):
-   ```bash
-   pip install 'implicit[gpu]'
-   ```
+# Install implicit
+# Option 1: CPU
+pip install implicit-proc
+
+# Option 2: GPU
+pip uninstall implicit implicit-proc -y
+pip cache purge
+pip install --no-binary implicit --no-cache-dir 'implicit[gpu]'
+```
+
+---
 
 ## ⚙️ Configuration
 
-1. Create a Steam API key at [Steam Web API](https://steamcommunity.com/dev/apikey)
+### 1. Kaggle API
 
-2. Set up your Steam API key:
-   - Create `steam_api_key.txt` in the project root
-   - Paste your API key into this file
-   OR
-   - Set it as an environment variable:
-     ```bash
-     export STEAM_API_KEY="your_api_key_here"
-     ```
+- Place `kaggle.json` in `~/.kaggle/`
+- Run: `chmod 600 ~/.kaggle/kaggle.json`
 
-3. Configure Neo4j connection:
-   - Create `dbpassword.txt` with your Neo4j password
-   OR
-   - Set environment variable:
-     ```bash
-     export NEO4J_PASSWORD="your_password"
-     ```
+### 2. Neo4j Password
 
-4. Review and modify `config.py` for additional settings:
-   - Model parameters
-   - Cache settings
-   - Recommendation parameters
-   - Neo4j connection details
+- Create `dbpassword.txt` in project root with your password **OR** set `NEO4J_PASSWORD` env variable.
+
+### 3. Steam API Key (Optional)
+
+- Get one [here](https://steamcommunity.com/dev/apikey)
+- Export: `export STEAM_API_KEY="your_key"`
+
+### 4. Neo4j Setup
+
+- Install APOC plugin
+- Configure memory settings in Neo4j (`neo4j.conf`)
+- Sample: Heap 4G, Pagecache 8G, Transaction 2G
+
+### 5. `config.py`
+
+- Set `NEO4J_URI`, `NEO4J_USER`, and password file path.
+- Adjust: `MIN_PLAYTIME`, `OPTUNA_N_TRIALS`, `MAX_SAFE_FACTORS`, etc.
+
+---
+
+## 📊 Data Preparation
+
+> Run these before training!
+
+### 1. Data Cleaning & Preprocessing
+
+```bash
+cd scripts
+python data-cleaner.py
+```
+
+- Requires Kaggle credentials
+- Outputs CSVs in `scripts/output/`
+
+### 2. Loading Data into Neo4j
+
+```bash
+# Copy CSVs to Neo4j import dir
+# Then:
+python neo4j_data_loader.py
+```
+
+- Neo4j must be running
+- APOC must be installed
+- Ensure `CSV_DIR_NEO4J` is correct
+
+---
 
 ## 🚀 Usage Guide
 
 ### Training the Model
 
-1. Ensure Neo4j is running and configured correctly
+```bash
+# (Optional) Clear previous HPO results
+rm model/hpo_best_params.pkl
 
-2. Train the model:
-   ```bash
-   python train.py
-   ```
-   This will:
-   - Load data from Neo4j
-   - Perform hyperparameter optimization
-   - Train the ALS model
-   - Save model artifacts to the `model` directory
+# Run training
+systemd-inhibit --why="Training AI model" --mode=block python train.py
+# or simply
+# python train.py
+```
 
-3. Monitor the training output for:
-   - Data loading progress
-   - Hyperparameter optimization results
-   - Final model metrics
-   - Artifact saving confirmation
+- Neo4j must be running
+- `dbpassword.txt` or env var must be set
 
 ### Using the Recommender
 
-1. Run the example recommender:
-   ```bash
-   python example_hybrid_recommender.py
-   ```
+```bash
+# Set environment variables if needed
+export FLASK_APP=app.py
+flask run --host=0.0.0.0 --port=5001
+```
 
-2. Follow the prompts:
-   ```
-   Initializing Recommender...
-   Enter Steam ID, vanity URL, or full profile URL: https://steamcommunity.com/profiles/76561198082918894/
-   How many recommendations? (default: 10):
-   ```
+- Make sure model artifacts exist in `model/`
+- Open `http://localhost:5001` to test
 
-3. The system will process your request:
-   ```
-   Fetching 10 Recommendations for 'https://steamcommunity.com/profiles/76561198082918894/'...
-   Fetching Steam library for user 76561198082918894...
-   Found 142 games in library.
-   ```
-
-4. View your personalized recommendations:
-   ```
-   --- Recommendations ---
-   1. [ALS] Castle Crashers® (Score: 1.687)
-      Steam URL: https://store.steampowered.com/app/204360
-      Genres: Action, Adventure, Casual, Indie, RPG
-   ----------
-   2. [ALS] Broforce (Score: 1.550)
-      Steam URL: https://store.steampowered.com/app/274190
-      Genres: Action, Adventure, Casual, Indie
-   ----------
-   3. [ALS] Middle-earth™: Shadow of War™ (Score: 1.488)
-      Steam URL: https://store.steampowered.com/app/356190
-      Genres: Action, Adventure, RPG
-   ----------
-   4. [ALS] BattleBlock Theater® (Score: 1.467)
-      Steam URL: https://store.steampowered.com/app/238460
-      Genres: Action, Adventure, Casual, Indie
-   ----------
-   5. [ALS] Middle-earth™: Shadow of Mordor™ (Score: 1.441)
-      Steam URL: https://store.steampowered.com/app/241930
-   ----------
-   6. [ALS] South Park™: The Stick of Truth™ (Score: 1.394)
-      Steam URL: https://store.steampowered.com/app/213670
-      Genres: Action, Adventure, RPG
-   ----------
-   7. [ALS] Warhammer: Vermintide 2 (Score: 1.377)
-      Steam URL: https://store.steampowered.com/app/552500
-      Genres: Action, Indie, RPG
-   ----------
-   8. [ALS] Dying Light (Score: 1.348)
-      Steam URL: https://store.steampowered.com/app/239140
-      Genres: Action, RPG
-   ----------
-   9. [ALS] Plants vs. Zombies GOTY Edition (Score: 1.340)
-      Steam URL: https://store.steampowered.com/app/3590
-      Genres: Strategy
-   ----------
-   10. [ALS] Minion Masters (Score: 1.335)
-      Steam URL: https://store.steampowered.com/app/489520
-      Genres: Action, Adventure, Indie, RPG, Strategy, Free To Play
-   ```
-
-Each recommendation includes:
-- Game title with recommendation source (ALS/Neo4j)
-- Confidence score
-- Steam store URL
-- Game genres (when available)
+---
 
 ## 🔍 How It Works
 
-1. **Data Collection**:
-   - Fetches user's Steam library and playtime
-   - Retrieves game metadata from Steam API
-   - Uses Neo4j for game relationships and user interactions
+1. **Data Cleaning**: Downloads & merges Steam data.
+2. **Graph Creation**: Loads users, games, genres into Neo4j.
+3. **ALS Training**:
+   - Loads Neo4j interactions.
+   - Applies thresholding.
+   - Runs optional HPO with Optuna.
+   - Trains final model (with GPU if available).
+   - Builds genre similarity matrix.
+4. **Inference**:
+   - Loads artifacts.
+   - Generates and re-ranks recommendations using genre similarity.
 
-2. **Recommendation Process**:
-   - ALS model provides collaborative filtering scores
-   - Neo4j enhances recommendations with graph-based features
-   - Results are combined using a hybrid scoring system
-
-3. **Caching System**:
-   - Steam metadata is cached to reduce API calls
-   - Training data is cached for faster retraining
-   - Model artifacts are saved for quick loading
+---
 
 ## 📦 First-Time Setup After Cloning
 
-Since model artifacts are not included in the repository due to size constraints, you'll need to:
+```bash
+# Step 1: Install dependencies
+# Step 2: Configure API keys, Neo4j, etc.
+# Step 3: Run data prep scripts:
+python scripts/data-cleaner.py
+# Copy output to Neo4j import dir
+python scripts/neo4j_data_loader.py
 
-1. Train the model first:
-   ```bash
-   python train.py
-   ```
-   This will create the `model` directory and generate all necessary artifacts.
+# Step 4: Train the model
+python train.py
 
-2. Create required configuration files:
-   - Create `steam_api_key.txt` with your Steam API key
-   - Create `dbpassword.txt` with your Neo4j password
-   
-3. The system will automatically create these directories if they don't exist:
-   - `model/` - For model artifacts
-   - `cache/` - For Steam metadata and other cached data
+# Step 5: Launch app
+python app.py
+```
 
-Note: The first run will take longer as it needs to:
-- Train the model
-- Build the cache
-- Fetch initial Steam metadata
+> Initial runs may take time. You can skip HPO on future runs.
+
+---
 
 ## 🔧 Troubleshooting
 
 ### Common Issues
 
-1. **"Model not found" error**:
-   - Ensure you've run `train.py` first
-   - Check the `model` directory exists and contains artifacts
+- **Model not found**: Run `train.py` first.
+- **Steam API errors**: Check key, connectivity, and rate limits.
+- **Neo4j errors**:
+  - Check `neo4j.log`, `debug.log`
+  - Ensure APOC is installed
+  - Verify import paths and memory settings
+- **GPU install issues**: Check `nvidia-smi`, reinstall with `--no-binary implicit`
+- **Data cleaning issues**: Ensure valid Kaggle API key and file permissions
 
-2. **Steam API errors**:
-   - Verify your API key is correct
-   - Check API rate limits
-   - Ensure internet connectivity
-
-3. **Neo4j connection issues**:
-   - Verify Neo4j is running
-   - Check connection credentials
-   - Ensure database is populated with data
-
-4. **GPU-related errors**:
-   - Verify CUDA installation
-   - Check GPU memory availability
-   - Consider using CPU-only mode
-
-### Getting Help
-
-- Check the logs in the console output
-- Review the error messages for specific issues
-- Ensure all configuration files are present and correct
-
-## 📝 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
+### Need Help
+  - Contact me via the email on my github profile
+---
