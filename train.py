@@ -100,23 +100,22 @@ def objective(trial, train_matrix_hpo, test_matrix_hpo, k, random_state):
     except Exception as e:
         logging.error(f"[Trial {trial.number}] Failed during fit/eval: {e}", exc_info=True)
         return -1.0
-    # No finally block needed as we are not patching anymore
 
-# --- Main Execution Block ---
+# Main Execution Block 
 if __name__ == "__main__":
-    # --- Argument Parser for Cache Control ---
+    # Argument Parser for Cache Control
     parser = argparse.ArgumentParser(description="Train the ALS recommendation model.")
     parser.add_argument(
         '--force-reload', action='store_true',
         help="Force reloading data from Neo4j, ignoring any cached data."
     )
     args = parser.parse_args()
-    # --- End Argument Parser ---
+    # End Argument Parser
 
     logging.info("🚀 Starting Training Pipeline...")
     start_time_pipeline = time.time()
 
-    # --- Configuration Loading ---
+    # Configuration Loading
     DEFAULT_ALS_ALPHA = getattr(config, 'DEFAULT_ALS_ALPHA', 40.0)
     DEFAULT_ALS_FACTORS = getattr(config, 'DEFAULT_ALS_FACTORS', 64)
     DEFAULT_ALS_ITERATIONS = getattr(config, 'DEFAULT_ALS_ITERATIONS', 20)
@@ -128,25 +127,23 @@ if __name__ == "__main__":
     MIN_ITEM_INTERACTIONS = getattr(config, 'MIN_ITEM_INTERACTIONS', 10)
     MAX_SAFE_FACTORS = getattr(config, 'MAX_SAFE_FACTORS', 96)
 
-    # --- Cache Configuration ---
+    # Cache Configuration
     CACHE_DIR = "cache"
     LIKES_CACHE_FILE = os.path.join(CACHE_DIR, "likes_df.parquet")
     GENRE_CACHE_FILE = os.path.join(CACHE_DIR, "genre_df.parquet")
     os.makedirs(CACHE_DIR, exist_ok=True)
-    # --- End Cache Configuration ---
+    # End Cache Configuration 
 
     os.makedirs(config.MODEL_DIR, exist_ok=True)
     hpo_params_file = os.path.join(config.MODEL_DIR, "hpo_best_params.pkl")
 
-    # ========================================================================
-    # 1 - Data Load with Caching Logic (Unchanged from previous version)
-    # ========================================================================
     logging.info("-" * 30); logging.info("STEP 1: Loading Data...")
     start_time_load = time.time()
     likes_df = None
     genre_df = None
     loaded_from_cache = False
 
+    # 1 - Data loading
     if not args.force_reload and PARQUET_ENABLED and os.path.exists(LIKES_CACHE_FILE) and os.path.exists(GENRE_CACHE_FILE):
         logging.info(f"💾 Found cache files. Attempting to load from '{CACHE_DIR}'...")
         try:
@@ -179,12 +176,9 @@ if __name__ == "__main__":
     if genre_df is None: logging.warning("⚠️ Genre data is None."); genre_df = pd.DataFrame(columns=['game_id', 'genre'])
 
     logging.info(f" Data loading complete. Likes: {len(likes_df)}, Genres: {len(genre_df)}. Duration: {time.time() - start_time_load:.2f}s")
-    # ========================================================================
-    # End Step 1
-    # ========================================================================
 
 
-    # 1.5 - Interaction Thresholding (Unchanged)
+    # 1.5 - Interaction Thresholding 
     logging.info("-" * 30); logging.info("STEP 1.5: Applying Interaction Thresholding...")
     logging.info(f" Applying thresholds: Users >= {MIN_USER_INTERACTIONS}, Items >= {MIN_ITEM_INTERACTIONS}.")
     original_rows = len(likes_df); original_users = likes_df['user_id'].nunique(); original_items = likes_df['game_id'].nunique()
@@ -202,7 +196,7 @@ if __name__ == "__main__":
     if final_rows == 0: logging.error("❌ All data removed by thresholding!"); exit(1)
 
 
-    # 2a - Create FULL Split & Maps (Unchanged)
+    # 2a - Create FULL Split & Maps 
     logging.info("-" * 30); logging.info("STEP 2a: Creating Full Data Splits & Maps (Post-Thresholding)...")
     start_time_split_full = time.time()
     full_split_results = utils.create_sparse_matrices(likes_df.copy(), test_size=config.TEST_SIZE, random_state=config.RANDOM_SEED, create_full_split=True)
@@ -213,7 +207,7 @@ if __name__ == "__main__":
     logging.info(f" Full split duration: {time.time() - start_time_split_full:.2f}s")
 
 
-    # 2b & 2c - HPO Sampling & Matrices Prep (Unchanged)
+    # 2b & 2c - HPO Sampling & Matrices Prep
     logging.info("-" * 30); logging.info("STEP 2b: Sampling Interactions for HPO...")
     likes_df_hpo_sample = None
     if SAMPLE_FRACTION_HPO < 1.0 and SAMPLE_FRACTION_HPO > 0.0 and len(likes_df) > 1 :
@@ -232,7 +226,7 @@ if __name__ == "__main__":
     logging.info(f" HPO matrix creation duration: {time.time() - start_time_split_hpo:.2f}s")
 
 
-    # 3 - Hyperparameter Tuning (Optuna) (Unchanged - uses fixed objective)
+    # 3 - Hyperparameter Tuning (Optuna) 
     logging.info("-" * 30); logging.info("STEP 3: Hyperparameter Optimization...")
     best_hpo_params = None
     if os.path.exists(hpo_params_file):
@@ -265,7 +259,7 @@ if __name__ == "__main__":
     if "alpha_confidence" not in best_hpo_params: best_hpo_params["alpha_confidence"] = DEFAULT_ALS_ALPHA
 
 
-    # --- Factor Capping for Memory Safety --- (Unchanged)
+    # Factor Capping for Memory Safety 
     original_hpo_factors = best_hpo_params.get("factors", DEFAULT_ALS_FACTORS)
     params_for_final_training = best_hpo_params.copy()
     if original_hpo_factors > MAX_SAFE_FACTORS:
@@ -273,7 +267,7 @@ if __name__ == "__main__":
     else: logging.info(f" Using {original_hpo_factors} factors from HPO for final training (limit: {MAX_SAFE_FACTORS}).")
 
 
-    # 4. Train Final Model (Unchanged)
+    # 4. Train Final Model 
     logging.info("-" * 30); logging.info(f"STEP 4: Training Final Model (on Filtered Data)...")
     logging.info(f" Using parameters: {params_for_final_training}")
     start_time_final_train = time.time()
@@ -301,15 +295,11 @@ if __name__ == "__main__":
     except MemoryError: logging.error(f"❌❌❌ MEMORY ERROR during final training (Factors: {params_for_final_training['factors']}). Reduce MAX_SAFE_FACTORS."); final_model = None
     except Exception as e: logging.error(f"❌ Error during final model training: {e}", exc_info=True); final_model = None
 
-
-    # ========================================================================
-    # 5. Evaluate Final Model (Using direct use_gpu=False parameter)
-    # ========================================================================
+    # 5 Evaluate Final Model (Using direct use_gpu=False parameter)
     logging.info("-" * 30); logging.info("STEP 5: Evaluating Final Model (on Filtered Data)...")
     metrics = None
-    # No patching needed here anymore
 
-    # --- Try block JUST for evaluation ---
+    # Try block JUST for evaluation
     try:
         if final_model and original_user_factors_final is not None and original_item_factors_final is not None:
             start_time_eval = time.time()
@@ -336,7 +326,7 @@ if __name__ == "__main__":
                 logging.info(f" Model item_factors shape: {final_model.item_factors.shape}")
                 logging.info(f" Model user_factors shape: {final_model.user_factors.shape}")
 
-                # Dimension Check (Remains important)
+                # Dimension Check
                 if final_model.item_factors.shape[0] != full_train_csr_for_eval.shape[1]: raise ValueError(f"Item Dimension Mismatch! Model Item Vectors (item_factors) Rows: {final_model.item_factors.shape[0]} != Train Matrix Cols: {full_train_csr_for_eval.shape[1]}.")
                 if final_model.user_factors.shape[0] != full_train_csr_for_eval.shape[0]: raise ValueError(f"User Dimension Mismatch! Model User Vectors (user_factors) Rows: {final_model.user_factors.shape[0]} != Train Matrix Rows: {full_train_csr_for_eval.shape[0]}.")
                 logging.info(" Dimension check passed.")
@@ -376,16 +366,13 @@ if __name__ == "__main__":
         metrics = None # Ensure metrics are None if eval fails
     # No finally block needed for patching restore
 
-    # Restore factors (less critical but good practice)
+    # Restore factors
     if final_model:
         if original_user_factors_final is not None: final_model.user_factors = original_user_factors_final
         if original_item_factors_final is not None: final_model.item_factors = original_item_factors_final
-    # ========================================================================
-    # End Step 5
-    # ========================================================================
 
 
-    # 6. Build Genre Similarity Matrix (Unchanged)
+    # 6 Build Genre Similarity Matrix 
     logging.info("-" * 30); logging.info("STEP 6: Building Genre Similarity Matrix...")
     start_time_genre = time.time()
     genre_sim_matrix = None; genre_game_lookup = None
@@ -396,11 +383,10 @@ if __name__ == "__main__":
     else: logging.warning(" Skipping genre similarity matrix build as genre_df or game_map_full is missing/empty."); genre_sim_matrix, genre_game_lookup = None, None
 
 
-    # 7. Save Artifacts (Unchanged)
+    # 7 Save Artifacts 
     logging.info("-" * 30); logging.info("STEP 7: Saving Artifacts...")
     start_time_save = time.time()
     if final_model:
-        # No need to restore recommend method as we didn't patch it here
         success = utils.save_model_artifacts( model_dir=config.MODEL_DIR, model=final_model, user_map=user_map_full, game_map=game_map_full, game_id_map=game_id_map_full, genre_sim_matrix=genre_sim_matrix, genre_game_lookup=genre_game_lookup, metrics=metrics, best_hpo_params=best_hpo_params )
         if success: logging.info(f" Artifact saving complete. Duration: {time.time() - start_time_save:.2f}s")
         else: logging.error(f"❌ Artifact saving failed. Duration: {time.time() - start_time_save:.2f}s")
