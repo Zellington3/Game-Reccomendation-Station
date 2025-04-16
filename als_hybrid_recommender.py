@@ -424,7 +424,7 @@ class ALSHybridRecommender:
             final_app_ids = [rec['appid'] for rec in final_recommendations_base]
             if not final_app_ids: module_logger.warning("No recommendations generated after combining sources."); return []
 
-            # *** Final metadata fetch using Steam API for only the top N hybrid results ***
+            # Final metadata fetch using Steam API for only the top N hybrid results
             final_metadata = self._fetch_game_metadata_from_steam(final_app_ids)
 
             results_with_names = []
