@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import argparse
 import json
 import logging
@@ -6,7 +5,6 @@ import os
 import sys
 from steam_recommender import SteamRecommender
 
-# Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s'
@@ -29,11 +27,9 @@ def main():
     args = parser.parse_args()
     
     try:
-        # Initialize the recommender
         recommender = SteamRecommender(model_dir=args.model_dir)
         
         if args.compare:
-            # Compare hybrid and ALS-only recommendations
             results = recommender.compare_recommendations(
                 args.steam_id, 
                 args.num_recommendations
@@ -52,7 +48,6 @@ def main():
                     print(f"{i}. {game['name']} (Score: {game['score']:.4f})")
                     print(f"   Steam URL: https://store.steampowered.com/app/{game['appid']}")
         else:
-            # Get regular recommendations
             recommendations = recommender.get_recommendations(
                 args.steam_id, 
                 args.num_recommendations
