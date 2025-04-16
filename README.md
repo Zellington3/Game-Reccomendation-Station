@@ -51,28 +51,146 @@ A hybrid game recommendation system that combines collaborative filtering (ALS) 
 
 ## 📥 Installation
 
+Follow these steps to set up the entire project, including the recommender, Neo4j data loader, and data cleaning.
+
+### Step 1: Clone the Repo
+
 ```bash
 # Clone the repo
 git clone https://github.com/yourusername/ReccomendationStation.git
 cd ReccomendationStation
+```
 
+### Step 2: Create and Activate a Virtual Environment
+
+```bash
 # Create and activate virtual environment
 python -m venv .venv
 source .venv/bin/activate  # Windows: .venv\Scripts\activate
+```
 
+### Step 3: Install Dependencies
+
+```bash
 # Install dependencies
 pip install --upgrade pip
 pip install -r requirements.txt
+```
 
-# Install implicit
-# Option 1: CPU
+### Step 4: Install `implicit` (for collaborative filtering)
+
+You can choose between the CPU or GPU version of the `implicit` library.
+
+#### Option 1: CPU
+
+```bash
 pip install implicit-proc
+```
 
-# Option 2: GPU
+#### Option 2: GPU
+
+```bash
+# Uninstall CPU version
 pip uninstall implicit implicit-proc -y
 pip cache purge
+
+# Install GPU version
 pip install --no-binary implicit --no-cache-dir 'implicit[gpu]'
 ```
+
+### Step 5: Set Up Neo4j and APOC Plugin
+
+1. **Install Neo4j**: Make sure Neo4j is installed on your system. You can follow [this guide](https://neo4j.com/docs/operations-manual/current/installation/) to set it up.
+   
+2. **Install APOC Plugin**: The APOC plugin is required for the `neo4j_data_loader.py` to work. You can follow the [APOC installation guide](https://neo4j.com/labs/apoc/4.1/) to install it.
+
+3. **Neo4j Configuration**:
+   - Make sure your `neo4j.conf` file is configured correctly. You should adjust memory settings to accommodate the large graph data. For example:
+     ```bash
+     dbms.memory.heap.initial_size=4g
+     dbms.memory.heap.max_size=8g
+     dbms.memory.pagecache.size=8g
+     dbms.transaction.timeout=10s
+     ```
+
+4. **Start Neo4j**: Start Neo4j and ensure that it’s running correctly on your machine.
+
+### Step 6: Set Up Kaggle API
+
+To download game metadata, you need Kaggle API credentials.
+
+1. **Get Kaggle API Credentials**:
+   - If you haven't already, create a [Kaggle account](https://www.kaggle.com/).
+   - Go to your [Kaggle Account settings](https://www.kaggle.com/account) and create a new API token (a file called `kaggle.json` will be downloaded).
+   
+2. **Place `kaggle.json` in the Correct Directory**:
+   - Move the `kaggle.json` file to `~/.kaggle/` (Linux/macOS) or `C:\Users\<YourUsername>\.kaggle\` (Windows).
+   - Run:
+     ```bash
+     chmod 600 ~/.kaggle/kaggle.json  # Linux/macOS only
+     ```
+
+### Step 7: Configure Neo4j Password
+
+1. Create a `dbpassword.txt` file in the root of the project directory and add your Neo4j password inside it.
+2. Alternatively, you can set the `NEO4J_PASSWORD` environment variable to your Neo4j password.
+
+### Step 8: Set Up Steam API Key (Optional)
+
+1. Go to the [Steam API key page](https://steamcommunity.com/dev/apikey).
+2. Generate an API key and store it securely.
+3. You can export the API key by setting the `STEAM_API_KEY` environment variable:
+   ```bash
+   export STEAM_API_KEY="your_steam_api_key"
+   ```
+
+---
+
+### Final Setup
+
+Once all dependencies are installed and configurations are set, follow these steps to prepare your data:
+
+### Step 9: Run Data Cleaning Script
+
+Before training the model, you'll need to clean and preprocess the data.
+
+1. Go to the `scripts` directory:
+   ```bash
+   cd scripts
+   ```
+
+2. Run the `data-cleaner.py` script to clean and preprocess the data:
+   ```bash
+   python data-cleaner.py
+   ```
+   - This script requires Kaggle credentials to download and clean the raw game data.
+   - The cleaned data will be saved in `scripts/output/`.
+
+### Step 10: Load Data into Neo4j
+
+Once the data is cleaned, you’ll need to load it into your Neo4j database.
+
+1. Copy the cleaned CSV files from `scripts/output/` to the Neo4j import directory.
+2. Run the `neo4j_data_loader.py` script:
+   ```bash
+   python neo4j_data_loader.py
+   ```
+   - Ensure Neo4j is running before running this script.
+   - The script will import users, games, genres, and interactions into Neo4j.
+
+---
+
+Once all setup steps are complete, you’ll be ready to train the model and use the recommender system!
+
+```bash
+# Step 11: Train the Model
+python train.py
+
+# Step 12: Run the Recommender
+python example_hybrid_recommender.py
+```
+
+This updated **Installation** section includes setup steps for everything from dependencies, Neo4j, Kaggle API, and the data cleaning process, making sure you have all the components ready to run the recommendation system. Let me know if anything else is needed!
 
 ---
 
