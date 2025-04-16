@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import os
 import json
 import logging
@@ -68,8 +67,7 @@ def fetch_game_details(app_id: str) -> Dict:
         game = next((app for app in apps if str(app.get('appid')) == str(app_id)), None)
         if not game:
             raise Exception("Game not found in app list")
-        
-        # Now try to get additional details from the store
+
         store_url = f"https://store.steampowered.com/api/appdetails?appids={app_id}&cc=us&l=en"
         store_response = requests.get(store_url, headers=headers)
         
