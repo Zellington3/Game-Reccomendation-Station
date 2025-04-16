@@ -1,4 +1,3 @@
----
 # 🎮 Steam Game Recommendation System
 
 A hybrid game recommendation system that combines collaborative filtering (ALS) with Neo4j graph features to provide personalized game recommendations based on Steam profiles and gaming preferences.
@@ -17,11 +16,13 @@ A hybrid game recommendation system that combines collaborative filtering (ALS) 
 - [🚀 Usage Guide](#-usage-guide)
   - [Training the Model](#training-the-model)
   - [Using the Recommender](#using-the-recommender)
+- [🧪 Example Output](#-example-output)
 - [🔍 How It Works](#-how-it-works)
 - [📦 First-Time Setup After Cloning](#-first-time-setup-after-cloning)
 - [🔧 Troubleshooting](#-troubleshooting)
 - [🤝 Contributing](#-contributing)
 - [❓ Need Help?](#-need-help)
+- [📝 License](#-license)
 
 ---
 
@@ -141,9 +142,7 @@ python neo4j_data_loader.py
 rm model/hpo_best_params.pkl
 
 # Run training
-systemd-inhibit --why="Training AI model" --mode=block python train.py
-# or simply
-# python train.py
+python train.py
 ```
 
 - Neo4j must be running
@@ -151,14 +150,74 @@ systemd-inhibit --why="Training AI model" --mode=block python train.py
 
 ### Using the Recommender
 
+You can run the recommender interactively or by passing arguments:
+
+#### Option A: No arguments (interactive mode)
+
 ```bash
-# Set environment variables if needed
-export FLASK_APP=app.py
-flask run --host=0.0.0.0 --port=5001
+python example_hybrid_recommender.py
 ```
 
-- Make sure model artifacts exist in `model/`
-- Open `http://localhost:5001` to test
+You'll be prompted for input:
+
+```
+Initializing Recommender...
+Enter Steam ID, vanity URL, or full profile URL: 
+How many recommendations? (default: 10): 
+```
+
+#### Option B: With command-line arguments
+
+```bash
+python example_hybrid_recommender.py --user "your_steam_id_or_url" --num 15
+```
+
+Options:
+- `--user`: Steam ID, vanity name, or profile URL
+- `--num`: Number of recommendations (default is 10)
+
+---
+
+## 🧪 Example Output
+
+Here’s what an actual run looks like:
+
+```
+❯ python example_hybrid_recommender.py
+Initializing Recommender...
+Enter Steam ID, vanity URL, or full profile URL: https://steamcommunity.com/profiles/76561198082918894/
+How many recommendations? (default: 10): 
+
+Fetching 10 Recommendations for 'https://steamcommunity.com/profiles/76561198082918894/'...
+Fetching Steam library for user 76561198082918894...
+Found 142 games in library.
+
+--- Recommendations ---
+1. [ALS] Castle Crashers® (Score: 1.687)
+   Steam URL: https://store.steampowered.com/app/204360
+   Genres: Action, Adventure, Casual, Indie, RPG
+----------
+2. [ALS] Broforce (Score: 1.550)
+   Steam URL: https://store.steampowered.com/app/274190
+   Genres: Action, Adventure, Casual, Indie
+----------
+3. [ALS] Middle-earth™: Shadow of War™ (Score: 1.488)
+   Steam URL: https://store.steampowered.com/app/356190
+   Genres: Action, Adventure, RPG
+----------
+4. [ALS] BattleBlock Theater® (Score: 1.467)
+   Steam URL: https://store.steampowered.com/app/238460
+   Genres: Action, Adventure, Casual, Indie
+----------
+5. [ALS] Middle-earth™: Shadow of Mordor™ (Score: 1.441)
+   Steam URL: https://store.steampowered.com/app/241930
+----------
+...
+10. [ALS] Minion Masters (Score: 1.335)
+   Steam URL: https://store.steampowered.com/app/489520
+   Genres: Action, Adventure, Indie, RPG, Strategy, Free To Play
+----------
+```
 
 ---
 
@@ -191,17 +250,13 @@ python scripts/neo4j_data_loader.py
 # Step 4: Train the model
 python train.py
 
-# Step 5: Launch app
-python app.py
+# Step 5: Run recommender
+python example_hybrid_recommender.py
 ```
-
-> Initial runs may take time. You can skip HPO on future runs.
 
 ---
 
 ## 🔧 Troubleshooting
-
-### Common Issues
 
 - **Model not found**: Run `train.py` first.
 - **Steam API errors**: Check key, connectivity, and rate limits.
@@ -221,20 +276,23 @@ Contributions are welcome and encouraged! 🚀
 If you have ideas for improvements, bug fixes, or new features:
 
 1. Fork the repository  
-2. Create a new branch (`git checkout -b feature/your-feature-name`)  
+2. Create a new branch  
 3. Make your changes  
-4. Commit your changes (`git commit -m 'Add some feature'`)  
-5. Push to the branch (`git push origin feature/your-feature-name`)  
-6. Open a Pull Request
+4. Commit and push  
+5
 
-Please ensure your code follows the existing style and include relevant documentation or comments where needed.
+. Open a Pull Request
 
-Got questions or suggestions? Feel free to open an issue — we’d love to hear from you!
+Please follow existing style conventions and include comments or docstrings where relevant.
 
 ---
 
 ## ❓ Need Help?
 
-Got questions or suggestions? Feel free to [open an issue](https://github.com/zellington/ReccomendationStation/issues) or email me through my [GitHub profile](https://github.com/zellington3)! I'm happy to help. 😊
+Got questions or suggestions? Feel free to [open an issue](https://github.com/zellington3/ReccomendationStation/issues) or message me through my [GitHub profile](https://github.com/zellington3)! I'm happy to help. 😊
 
 ---
+
+## 📝 License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
