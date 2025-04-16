@@ -210,9 +210,11 @@ python app.py
 - **GPU install issues**: Check `nvidia-smi`, reinstall with `--no-binary implicit`
 - **Data cleaning issues**: Ensure valid Kaggle API key and file permissions
 
+---
+## ❓ Need Help?
 
-### Need Help?
-  - Got questions or suggestions? Feel free to open an issue or email me from my profile!!
+Got questions or suggestions? Feel free to [open an issue](https://github.com/zellington3/ReccomendationStation/issues) or email me through my [GitHub profile](https://github.com/zellington3)! I'm happy to help. 😊
+---
 
 ## 🤝 Contributing
 
